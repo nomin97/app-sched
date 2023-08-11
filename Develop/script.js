@@ -12,28 +12,76 @@
 // WHEN I refresh the page
 // THEN the saved events persist
 
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
-$(function () {
-  // TODO: Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-  //
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-  //
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
-});
+// variables
+var savebtn = document.querySelectorAll(".btn");
+var timeBlocksEl = document.querySelectorAll(".time-block");
+var userInput = [];
 
-var past = document
+renderText()
+
+// display date & time
+function clock() {
+  $('#currentDay').text(dayjs().format('MMMM DD, YYYY hh:mm A'));
+  timeblockloop()
+  setTimeout(clock, 1000);
+}
+clock()
+
+function timeblockloop() {
+  // run each timeblock through the function
+  timeBlocksEl.forEach((timeblock, i) => {
+    colorBlocks(timeblock, i)
+  });
+}
+
+// check time and add corresponding styling 
+function colorBlocks(timeblock, i) {
+  // finds the current hour
+  var currentHour = dayjs().format('H');
+  if (i + 9 == currentHour) {
+    timeBlocksEl[i].classList.remove("future");
+    timeBlocksEl[i].classList.remove("past");
+    timeBlocksEl[i].classList.add("present");
+  } else if (i + 9 < currentHour) {
+    timeBlocksEl[i].classList.remove("present");
+    timeBlocksEl[i].classList.remove("future");
+    timeBlocksEl[i].classList.add("past");
+  } else {
+    timeBlocksEl[i].classList.remove("past");
+    timeBlocksEl[i].classList.remove("present");
+    timeBlocksEl[i].classList.add("future");
+  }
+}
+
+// save button
+savebtn.forEach((button, i) => {
+  savebtn[i].addEventListener("click", saveFunction);
+})
+
+// save to local storage
+function saveFunction(e) {
+  var parentId = e.target.parentElement.parentElement.getAttribute("id");
+  var parentEl = document.getElementById(parentId);
+  var object = {
+    id: parentId,
+    content: parentEl.children[1].value
+  }
+  // check if text is in timeblock 
+  const matchingText = userInput.findText(
+    (item) => item.id === object.id
+  )
+  if (matchingText !== -1) {
+    userInput[matchingText] = { id: object.id, content: object.content }
+  } else {
+    userInput.push(object);
+  }
+  localStorage.setItem("savedText", JSON.stringify(userInput))
+}
+// get text from local storage
+function renderText() {
+  userInput = JSON.parse(localStorage.getItem("savedText") || "[]");
+  for (var i = 0; i < userInput.length; i++) {
+    var parentEl = document.getElementById(userInput[i].id);
+    parentEl.children[1].textContent = userInput[i].content;
+  }
+}
