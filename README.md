@@ -9,6 +9,7 @@ n/a
 ## Usage
 Choose time and type in activity to be done at that time. 
 ![alt](./Assets/Screen%20Shot%202023-08-11%20at%202.21.57%20PM.png)
+https://nomin97.github.io/app-sched/
 
 ## Credit
 Original code cloned from starter repo "crispy-octo-meme" from user Xandromus. Help from day.js (https://day.js.org/docs/en/installation/typescript). Class activities and help from class. 
